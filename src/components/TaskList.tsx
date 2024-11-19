@@ -17,9 +17,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, fetchTasks, router }) => {
 	}, [tasks])
 
 	const updateTaskStatus = (id: number, completed: boolean) => {
-		const updatedTasks = taskList.map(task =>
-			task.id === id ? { ...task, completed } : task
-		)
+		const updatedTasks = taskList.filter(task => task.id !== id)
 		setTaskList(updatedTasks)
 		/*try {
 			await TasksService.updateTaskStatus(id, completed)
@@ -37,8 +35,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, fetchTasks, router }) => {
 				style: 'destructive',
 				onPress: () => {
 					const updatedTasks = taskList.filter(task => task.id !== id)
-					setTaskList(updatedTasks) // Обновляем локальное состояние
-					// Также можно сделать запрос на удаление задачи
+					setTaskList(updatedTasks)
 					/* try {
 						await TasksService.deleteTask(id)
 						fetchTasks()
