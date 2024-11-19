@@ -20,9 +20,15 @@ export default function StackLayout() {
 				name='index'
 				options={{
 					title: 'Home',
+					headerShown: false,
 				}}
 			/>
-			<Stack.Screen name='create-task' options={{}} />
+			<Stack.Screen
+				name='create-task'
+				options={{
+					title: 'Добавить запись',
+				}}
+			/>
 		</Stack>
 	)
 }
