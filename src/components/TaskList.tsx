@@ -84,7 +84,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, fetchTasks, router }) => {
 
 const styles = StyleSheet.create({
 	taskCard: {
-		marginBottom: 12,
+		margin: 10,
 	},
 	cardContent: {
 		flexDirection: 'row',
