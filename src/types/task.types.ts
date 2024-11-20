@@ -17,3 +17,8 @@ export interface TasksBlockProps {
 	fetchTasks: () => Promise<void>
 	router: any
 }
+
+export interface TaskFormProps {
+	tasks: Task[]
+	setTasks: React.Dispatch<React.SetStateAction<Task[]>>
+}

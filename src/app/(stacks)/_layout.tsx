@@ -25,8 +25,11 @@ export default function StackLayout() {
 			/>
 			<Stack.Screen
 				name='create-task'
-				options={{
-					title: 'Добавить запись',
+				options={({ route }) => {
+					const task = route?.params?.task
+					return {
+						title: task ? 'Редактировать задачу' : 'Добавить задачу',
+					}
 				}}
 			/>
 		</Stack>

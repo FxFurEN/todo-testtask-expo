@@ -47,10 +47,15 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, fetchTasks, router }) => {
 		])
 	}
 	const handleTaskPress = (id: number) => {
-		router.push({
-			pathname: '/(stacks)/edit-task',
-			params: { id },
-		})
+		if (taskList) {
+			const taskToEdit = taskList.find(task => task.id === id)
+			if (taskToEdit) {
+				router.push({
+					pathname: '/(stacks)/create-task',
+					params: { task: JSON.stringify(taskToEdit) },
+				})
+			}
+		}
 	}
 
 	const renderItem = ({ item }: { item: Task }) => (
