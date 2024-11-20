@@ -3,10 +3,11 @@ import { Task } from '@/src/types'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { FAB } from 'react-native-paper'
+import { Button, FAB } from 'react-native-paper'
 
 export default function HomeScreen() {
 	const [tasks, setTasks] = useState<Task[]>([])
+	const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
 	const router = useRouter()
 
 	useEffect(() => {
@@ -20,7 +21,7 @@ export default function HomeScreen() {
 			{
 				id: 2,
 				title: 'Задача 2',
-				completed: false,
+				completed: true,
 				description: 'Описание задачи 2',
 			},
 			{
@@ -35,9 +36,44 @@ export default function HomeScreen() {
 
 	const fetchTasks = async () => {}
 
+	const getFilteredTasks = () => {
+		switch (filter) {
+			case 'active':
+				return tasks.filter(task => !task.completed)
+			case 'completed':
+				return tasks.filter(task => task.completed)
+			default:
+				return tasks
+		}
+	}
+
 	return (
 		<View style={styles.container}>
-			<TasksBlock tasks={tasks} fetchTasks={fetchTasks} router={router} />
+			<View style={styles.filterContainer}>
+				<Button
+					mode={filter === 'all' ? 'contained' : 'outlined'}
+					onPress={() => setFilter('all')}
+				>
+					Все
+				</Button>
+				<Button
+					mode={filter === 'active' ? 'contained' : 'outlined'}
+					onPress={() => setFilter('active')}
+				>
+					Активные
+				</Button>
+				<Button
+					mode={filter === 'completed' ? 'contained' : 'outlined'}
+					onPress={() => setFilter('completed')}
+				>
+					Выполненные
+				</Button>
+			</View>
+			<TasksBlock
+				tasks={getFilteredTasks()}
+				fetchTasks={fetchTasks}
+				router={router}
+			/>
 			<FAB
 				style={styles.fab}
 				icon='plus'
@@ -52,6 +88,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginTop: 30,
 		padding: 16,
+	},
+	filterContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 16,
 	},
 	fab: {
 		position: 'absolute',
