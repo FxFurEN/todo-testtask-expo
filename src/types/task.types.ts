@@ -1,5 +1,5 @@
 export interface Task {
-	id: number
+	id: string
 	title: string
 	description: string
 	completed: boolean
@@ -7,15 +7,15 @@ export interface Task {
 
 export interface TaskListProps {
 	tasks: Task[]
-	fetchTasks: () => Promise<void>
 	router: any
+	onTasksChange: (tasks: Task[]) => void
 }
 
 export interface TasksBlockProps {
 	tasks: Task[]
 	filter: 'all' | 'active' | 'completed'
-	fetchTasks: () => Promise<void>
 	router: any
+	onTasksChange: (tasks: Task[]) => void
 }
 
 export interface TaskFormProps {

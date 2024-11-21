@@ -1,8 +1,9 @@
 import TasksBlock from '@/src/components/TasksBlock'
+import { TasksService } from '@/src/services/tasks.service'
 import { Task } from '@/src/types'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { Button, FAB } from 'react-native-paper'
 
 export default function HomeScreen() {
@@ -11,41 +12,34 @@ export default function HomeScreen() {
 	const router = useRouter()
 
 	useEffect(() => {
-		const dummyTasks = [
-			{
-				id: 1,
-				title: 'Задача 1',
-				completed: false,
-				description: 'Описание задачи 1',
-			},
-			{
-				id: 2,
-				title: 'Задача 2',
-				completed: true,
-				description: 'Описание задачи 2',
-			},
-			{
-				id: 3,
-				title: 'Задача 3',
-				completed: false,
-				description: 'Описание задачи 3',
-			},
-		]
-		setTasks(dummyTasks)
+		const fetchTasks = async () => {
+			try {
+				const tasksData = await TasksService.getAllTasks()
+				setTasks(tasksData)
+			} catch (error) {
+				console.error('Ошибка при получении задач:', error)
+			}
+		}
+		fetchTasks()
 	}, [])
 
-	const fetchTasks = async () => {}
-
+	// хз почему но даже при явном объявлении boolean он не работе, в бд тоже boolean, на всякий случай указал и строку
 	const getFilteredTasks = () => {
 		switch (filter) {
 			case 'active':
-				return tasks.filter(task => !task.completed)
+				return tasks.filter(
+					task => task.completed === false || task.completed === 'false'
+				)
 			case 'completed':
-				return tasks.filter(task => task.completed)
+				return tasks.filter(
+					task => task.completed === true || task.completed === 'true'
+				)
 			default:
 				return tasks
 		}
 	}
+
+	const filteredTasks = getFilteredTasks()
 
 	return (
 		<View style={styles.container}>
@@ -69,11 +63,19 @@ export default function HomeScreen() {
 					Выполненные
 				</Button>
 			</View>
-			<TasksBlock
-				tasks={getFilteredTasks()}
-				fetchTasks={fetchTasks}
-				router={router}
-			/>
+
+			{filteredTasks.length === 0 ? (
+				<View style={styles.noTasksContainer}>
+					<Text>Нет задач</Text>
+				</View>
+			) : (
+				<TasksBlock
+					tasks={filteredTasks}
+					router={router}
+					onTasksChange={setTasks}
+				/>
+			)}
+
 			<FAB
 				style={styles.fab}
 				icon='plus'
@@ -93,6 +95,11 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		marginBottom: 16,
+	},
+	noTasksContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	fab: {
 		position: 'absolute',

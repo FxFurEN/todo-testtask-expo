@@ -1,3 +1,4 @@
+import { TasksService } from '@/src/services/tasks.service'
 import { Task, TaskFormProps } from '@/src/types'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
@@ -20,22 +21,26 @@ const TaskFormScreen: React.FC<TaskFormProps> = ({ tasks, setTasks }) => {
 		}
 	}, [task])
 
-	const handleSubmit = () => {
-		if (isEditMode) {
-			const updatedTasks = tasks.map(task =>
-				task.id === Number(task.id) ? { ...task, title, description } : task
-			)
-			setTasks(updatedTasks)
-		} else {
-			const newTask: Task = {
-				id: tasks.length + 1,
-				title,
-				description,
-				completed: false,
+	const handleSubmit = async () => {
+		const newTask: Task = { title, description, completed: false }
+		const updatedTask: Partial<Task> = { title, description }
+
+		if (isEditMode && task) {
+			try {
+				const parsedTask = JSON.parse(task as string) as Task
+				await TasksService.updateTask(parsedTask.id, updatedTask)
+				router.push('/')
+			} catch (error) {
+				console.error('Ошибка при обновлении задачи:', error)
 			}
-			setTasks([...tasks, newTask])
+		} else {
+			try {
+				await TasksService.createTask(newTask)
+				router.push('/')
+			} catch (error) {
+				console.error('Ошибка при создании задачи:', error)
+			}
 		}
-		router.push('/')
 	}
 
 	return (

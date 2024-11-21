@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
 	Alert,
 	FlatList,
@@ -7,54 +7,56 @@ import {
 	View,
 } from 'react-native'
 import { Button, Card, Checkbox, Text } from 'react-native-paper'
+import { TasksService } from '../services/tasks.service'
 import { Task, TaskListProps } from '../types'
 
-const TaskList: React.FC<TaskListProps> = ({ tasks, fetchTasks, router }) => {
+const TaskList: React.FC<TaskListProps> = ({
+	tasks,
+	router,
+	onTasksChange,
+}) => {
 	const [taskList, setTaskList] = useState<Task[]>(tasks)
 
-	useEffect(() => {
-		setTaskList(tasks)
-	}, [tasks])
-
-	const updateTaskStatus = (id: number, completed: boolean) => {
-		const updatedTasks = taskList.filter(task => task.id !== id)
-		setTaskList(updatedTasks)
-		/*try {
+	const updateTaskStatus = async (id: string, completed: boolean) => {
+		try {
 			await TasksService.updateTaskStatus(id, completed)
-			fetchTasks()
+			const updatedTasks = taskList.map(task =>
+				task.id === id ? { ...task, completed } : task
+			)
+			setTaskList(updatedTasks)
+			onTasksChange(updatedTasks)
 		} catch (error) {
 			console.error('Ошибка обновления статуса задачи:', error)
-		} */
+		}
 	}
 
-	const deleteTask = (id: number) => {
+	const deleteTask = (id: string) => {
 		Alert.alert('Удаление', 'Вы уверены, что хотите удалить задачу?', [
 			{ text: 'Отмена', style: 'cancel' },
 			{
 				text: 'Удалить',
 				style: 'destructive',
-				onPress: () => {
-					const updatedTasks = taskList.filter(task => task.id !== id)
-					setTaskList(updatedTasks)
-					/* try {
+				onPress: async () => {
+					try {
 						await TasksService.deleteTask(id)
-						fetchTasks()
+						const updatedTasks = taskList.filter(task => task.id !== id)
+						setTaskList(updatedTasks)
+						onTasksChange(updatedTasks)
 					} catch (error) {
 						console.error('Ошибка удаления задачи:', error)
-					} */
+					}
 				},
 			},
 		])
 	}
+
 	const handleTaskPress = (id: number) => {
-		if (taskList) {
-			const taskToEdit = taskList.find(task => task.id === id)
-			if (taskToEdit) {
-				router.push({
-					pathname: '/(stacks)/create-task',
-					params: { task: JSON.stringify(taskToEdit) },
-				})
-			}
+		const taskToEdit = taskList.find(task => task.id === id)
+		if (taskToEdit) {
+			router.push({
+				pathname: '/(stacks)/create-task',
+				params: { task: JSON.stringify(taskToEdit) },
+			})
 		}
 	}
 
@@ -81,7 +83,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, fetchTasks, router }) => {
 	return (
 		<FlatList
 			data={taskList}
-			keyExtractor={item => item.id.toString()}
+			keyExtractor={item => item.id}
 			renderItem={renderItem}
 		/>
 	)

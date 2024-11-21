@@ -4,10 +4,12 @@ import TaskList from './TaskList'
 
 const TasksBlock: React.FC<TasksBlockProps> = ({
 	tasks,
-	fetchTasks,
 	router,
+	onTasksChange,
 }) => {
-	return <TaskList tasks={tasks} fetchTasks={fetchTasks} router={router} />
+	return (
+		<TaskList tasks={tasks} router={router} onTasksChange={onTasksChange} />
+	)
 }
 
 export default TasksBlock
